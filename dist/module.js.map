@@ -1,0 +1,1 @@
+{"version":3,"sources":["../src/module.js"],"names":[],"mappings":";;;;;;;;;AAAO,O;;AACC,iB,iBAAA,W;;;2BAGN,W","file":"module.js","sourcesContent":["import _ from 'lodash';\nimport {Graph3dCtrl} from './graph3d_ctrl';\n\nexport {\n  Graph3dCtrl as PanelCtrl\n};\n\n"]}

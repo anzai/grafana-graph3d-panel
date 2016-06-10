@@ -1,0 +1,33 @@
+{
+  "type": "panel",
+  "name": "Graph 3D",
+  "id": "grafana-graph3d-panel",
+
+  "info": {
+    "description": "Graph 3D panel for grafana",
+    "author": {
+      "name": "Nozomi Anzai",
+      "url": ""
+    },
+    "keywords": ["graph3d", "panel"],
+    "links": [
+      {"name": "Project site", "url": ""},
+      {"name": "Blog Post", "url": ""},
+      {"name": "MIT License", "url": ""}
+    ],
+    "screenshots": [
+      {"name": "Donut!", "path": "src/img/graph3d-donut.png"},
+      {"name": "Legend on the graph", "path": "src/img/graph3d-legend-on-graph.png"},
+      {"name": "Legend to the right", "path": "src/img/graph3d-legend-rhs.png"},
+      {"name": "Legend underneath", "path": "src/img/graph3d-legend-under.png"},
+      {"name": "graph3d options", "path": "src/img/graph3d-options.png"}
+    ],
+    "version": "1.0",
+    "updated": "2016-06-10"
+  },
+
+  "dependencies": {
+    "grafanaVersion": "3.x.x",
+    "plugins": [ ]
+  }
+}
