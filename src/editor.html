@@ -1,5 +1,11 @@
 <div class="editor-row">
 	<div class="section gf-form-group">
+		<h5 class="section-heading">General</h5>
+		<div class="gf-form">
+			<span class="gf-form-label width-8">Graph style</span>
+			<select class="gf-form-input" ng-model="ctrl.panel.style" ng-options="t for t in ['bar', 'bar-color', 'dot', 'dot-line', 'dot-color', 'dot-size', 'line', 'grid', 'surface']" ng-change="ctrl.render()"></select>
+		</div>
+
 		<h5 class="section-heading">Camera Position</h5>
 		<div class="gf-form">
 			<span class="gf-form-label width-8">Horizontal</span>
@@ -18,6 +24,40 @@
 		</div>
 		<div class="gf-form">
 			<input type="button" value="Load current posotion" ng-click="ctrl.loadCameraPosition()">
+		</div>
+	</div>
+
+	<div class="section gf-form-group">
+		<h5 class="section-heading">Label/Min/Max</h5>
+		<div class="gf-form">
+			<span class="gf-form-label width-4">xLabel</span>
+			<input type="text" class="gf-form-input max-width-8" ng-model="ctrl.panel.xLabel" ng-change="ctrl.render()">
+			<span class="gf-form-label width-4">xMin</span>
+			<input type="text" class="gf-form-input max-width-4" ng-model="ctrl.panel.xMin" ng-change="ctrl.render()">
+			<span class="gf-form-label width-4">xMax</span>
+			<input type="text" class="gf-form-input max-width-4" ng-model="ctrl.panel.xMax" ng-change="ctrl.render()">
+			<span class="gf-form-label width-4">xStep</span>
+			<input type="text" class="gf-form-input max-width-4" ng-model="ctrl.panel.xStep" ng-change="ctrl.render()">
+		</div>
+		<div class="gf-form">
+			<span class="gf-form-label width-4">yLabel</span>
+			<input type="text" class="gf-form-input max-width-8" ng-model="ctrl.panel.yLabel" ng-change="ctrl.render()">
+			<span class="gf-form-label width-4">yMin</span>
+			<input type="text" class="gf-form-input max-width-4" ng-model="ctrl.panel.yMin" ng-change="ctrl.render()">
+			<span class="gf-form-label width-4">yMax</span>
+			<input type="text" class="gf-form-input max-width-4" ng-model="ctrl.panel.yMax" ng-change="ctrl.render()">
+			<span class="gf-form-label width-4">yStep</span>
+			<input type="text" class="gf-form-input max-width-4" ng-model="ctrl.panel.yStep" ng-change="ctrl.render()">
+		</div>
+		<div class="gf-form">
+			<span class="gf-form-label width-4">zLabel</span>
+			<input type="text" class="gf-form-input max-width-8" ng-model="ctrl.panel.zLabel" ng-change="ctrl.render()">
+			<span class="gf-form-label width-4">zMin</span>
+			<input type="text" class="gf-form-input max-width-4" ng-model="ctrl.panel.zMin" ng-change="ctrl.render()">
+			<span class="gf-form-label width-4">yMax</span>
+			<input type="text" class="gf-form-input max-width-4" ng-model="ctrl.panel.zMax" ng-change="ctrl.render()">
+			<span class="gf-form-label width-4">zStep</span>
+			<input type="text" class="gf-form-input max-width-4" ng-model="ctrl.panel.zStep" ng-change="ctrl.render()">
 		</div>
 	</div>
 </div>

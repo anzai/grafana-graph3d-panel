@@ -112,15 +112,29 @@ System.register(['lodash', 'jquery', './vis'], function (_export, _context) {
       var options = {
         width: size + 'px',
         height: size + 'px',
-        style: 'bar',
+        axisColor: '#888888',
+
+        style: panel.style,
         showPerspective: true,
         showGrid: true,
         showShadow: false,
         verticalRatio: 0.5,
 
-        xLabel: 'time',
-        yLabel: labels[0],
-        zLabel: labels[1],
+        xLabel: panel.xLabel || 'time',
+        yLabel: panel.yLabel || labels[0],
+        zLabel: panel.zLabel || labels[1],
+
+        xMin: panel.xMin || null,
+        yMin: panel.yMin || null,
+        zMin: panel.zMin || null,
+
+        xMax: panel.xMax || null,
+        yMax: panel.yMax || null,
+        zMax: panel.zMax || null,
+
+        xStep: panel.xStep || null,
+        yStep: panel.yStep || null,
+        zStep: panel.zStep || null,
 
         xValueLabel: function xValueLabel(key) {
           return valueLabels[0][key];
@@ -130,9 +144,16 @@ System.register(['lodash', 'jquery', './vis'], function (_export, _context) {
         },
 
         tooltip: function tooltip(point) {
-          return 'time: ' + valueLabels[0][point.x] + '<br>' + labels[0] + ': ' + valueLabels[1][point.y] + '<br>' + labels[1] + ': <b>' + point.z + '</b>';
+          return (panel.xLabel || 'time') + ': ' + valueLabels[0][point.x] + '<br>' + (panel.yLabel || labels[0]) + ': ' + valueLabels[1][point.y] + '<br>' + (panel.zLabel || labels[1]) + ': <b>' + point.z + '</b>';
         }
       };
+
+      for (var key in options) {
+        if (options[key] === null) {
+          delete options[key];
+        }
+      }
+      console.log(options);
 
       // draw
       var graph3d = new vis.Graph3d(plotDiv, graphdata, options);

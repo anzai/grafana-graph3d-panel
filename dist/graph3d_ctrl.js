@@ -74,6 +74,10 @@ System.register(['app/plugins/sdk', 'lodash', 'app/core/time_series', './renderi
 
           _this.$rootScope = $rootScope;
 
+          var panelDefault = {
+            style: 'bar'
+          };
+          _.defaults(_this.panel, panelDefault);
           if (!_this.panel.cameraPosition) {
             _this.resetCameraPosition();
           }

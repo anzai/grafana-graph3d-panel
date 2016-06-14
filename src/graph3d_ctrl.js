@@ -10,6 +10,10 @@ export class Graph3dCtrl extends MetricsPanelCtrl {
     super($scope, $injector);
     this.$rootScope = $rootScope;
 
+    var panelDefault = {
+      style: 'bar'
+    }
+    _.defaults(this.panel, panelDefault);
     if (! this.panel.cameraPosition) {
       this.resetCameraPosition();
     }
