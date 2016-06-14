@@ -3,7 +3,7 @@ import $ from 'jquery';
 import vis from './vis';
 
 export default function link(scope, elem, attrs, ctrl) {
-  var data, panel;
+  var data, panel, position;
   elem = elem.find('.graph3d-panel');
 
   ctrl.events.on('render', function() {
@@ -43,10 +43,22 @@ export default function link(scope, elem, attrs, ctrl) {
   function getKey(arr, val) {
     return parseInt(_.keys(arr).find(function(key) {
       return arr[key] == val;
-      }));
+    }));
+  }
+
+  function onCameraPositionChange(event) {
+    ctrl.currentCameraPosition = {
+      horizontal: event.horizontal,
+      vertical: event.vertical,
+      distance: event.distance
+    };
   }
 
   function addGraph3d() {
+    if (data.length === 0) {
+      return;
+    }
+
     var labels = _.pluck(data, 'label');
 
     var datapoints = [];
@@ -119,9 +131,12 @@ export default function link(scope, elem, attrs, ctrl) {
     };
 
     // draw
-    var graph = new vis.Graph3d(plotDiv, graphdata, options);
+    var graph3d = new vis.Graph3d(plotDiv, graphdata, options);
+    graph3d.on('cameraPositionChange', onCameraPositionChange);
+    graph3d.setCameraPosition(panel.cameraPosition);
+
     elem.html(plotDiv);
-    graph.redraw();
+    graph3d.redraw();
   }
 }
 

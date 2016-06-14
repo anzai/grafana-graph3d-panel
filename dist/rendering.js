@@ -6,7 +6,7 @@ System.register(['lodash', 'jquery', './vis'], function (_export, _context) {
   var _, $, vis;
 
   function link(scope, elem, attrs, ctrl) {
-    var data, panel;
+    var data, panel, position;
     elem = elem.find('.graph3d-panel');
 
     ctrl.events.on('render', function () {
@@ -52,7 +52,19 @@ System.register(['lodash', 'jquery', './vis'], function (_export, _context) {
       }));
     }
 
+    function onCameraPositionChange(event) {
+      ctrl.currentCameraPosition = {
+        horizontal: event.horizontal,
+        vertical: event.vertical,
+        distance: event.distance
+      };
+    }
+
     function addGraph3d() {
+      if (data.length === 0) {
+        return;
+      }
+
       var labels = _.pluck(data, 'label');
 
       var datapoints = [];
@@ -123,9 +135,12 @@ System.register(['lodash', 'jquery', './vis'], function (_export, _context) {
       };
 
       // draw
-      var graph = new vis.Graph3d(plotDiv, graphdata, options);
+      var graph3d = new vis.Graph3d(plotDiv, graphdata, options);
+      graph3d.on('cameraPositionChange', onCameraPositionChange);
+      graph3d.setCameraPosition(panel.cameraPosition);
+
       elem.html(plotDiv);
-      graph.redraw();
+      graph3d.redraw();
     }
   }
 

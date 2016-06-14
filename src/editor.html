@@ -1,0 +1,23 @@
+<div class="editor-row">
+	<div class="section gf-form-group">
+		<h5 class="section-heading">Camera Position</h5>
+		<div class="gf-form">
+			<span class="gf-form-label width-8">Horizontal</span>
+			<input type="text" class="gf-form-input max-width-10" ng-model="ctrl.panel.cameraPosition.horizontal" ng-change="ctrl.render()">
+		</div>
+		<div class="gf-form">
+			<span class="gf-form-label width-8">Vertical</span>
+			<input type="text" class="gf-form-input max-width-10" ng-model="ctrl.panel.cameraPosition.vertical" ng-change="ctrl.render()">
+		</div>
+		<div class="gf-form">
+			<span class="gf-form-label width-8">Distance</span>
+			<input type="text" class="gf-form-input max-width-10" ng-model="ctrl.panel.cameraPosition.distance" ng-change="ctrl.render()">
+		</div>
+		<div class="gf-form">
+			<input type="button" value="Reset posision" ng-click="ctrl.resetCameraPosition()">
+		</div>
+		<div class="gf-form">
+			<input type="button" value="Load current posotion" ng-click="ctrl.loadCameraPosition()">
+		</div>
+	</div>
+</div>

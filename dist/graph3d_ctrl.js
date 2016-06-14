@@ -1,9 +1,9 @@
 'use strict';
 
-System.register(['app/plugins/sdk', 'lodash', 'app/core/utils/kbn', 'app/core/time_series', './rendering'], function (_export, _context) {
+System.register(['app/plugins/sdk', 'lodash', 'app/core/time_series', './rendering'], function (_export, _context) {
   "use strict";
 
-  var MetricsPanelCtrl, _, kbn, TimeSeries, rendering, _createClass, Graph3dCtrl;
+  var MetricsPanelCtrl, _, TimeSeries, rendering, _createClass, Graph3dCtrl;
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -40,8 +40,6 @@ System.register(['app/plugins/sdk', 'lodash', 'app/core/utils/kbn', 'app/core/ti
       MetricsPanelCtrl = _appPluginsSdk.MetricsPanelCtrl;
     }, function (_lodash) {
       _ = _lodash.default;
-    }, function (_appCoreUtilsKbn) {
-      kbn = _appCoreUtilsKbn.default;
     }, function (_appCoreTime_series) {
       TimeSeries = _appCoreTime_series.default;
     }, function (_rendering) {
@@ -76,22 +74,9 @@ System.register(['app/plugins/sdk', 'lodash', 'app/core/utils/kbn', 'app/core/ti
 
           _this.$rootScope = $rootScope;
 
-          var panelDefaults = {
-            links: [],
-            datasource: null,
-            maxDataPoints: 3,
-            interval: null,
-            targets: [{}],
-            cacheTimeout: null,
-            nullPointMode: 'connected',
-            aliasColors: {},
-            format: 'short',
-            valueName: 'current',
-            strokeWidth: 1,
-            fontSize: '80%'
-          };
-
-          _.defaults(_this.panel, panelDefaults);
+          if (!_this.panel.cameraPosition) {
+            _this.resetCameraPosition();
+          }
 
           _this.events.on('render', _this.onRender.bind(_this));
           _this.events.on('data-received', _this.onDataReceived.bind(_this));
@@ -104,26 +89,12 @@ System.register(['app/plugins/sdk', 'lodash', 'app/core/utils/kbn', 'app/core/ti
         _createClass(Graph3dCtrl, [{
           key: 'onInitEditMode',
           value: function onInitEditMode() {
-            //this.addEditorTab('Options', 'public/plugins/grafana-graph3d-panel/editor.html', 2);
-            //this.unitFormats = kbn.getUnitFormats();
-          }
-        }, {
-          key: 'setUnitFormat',
-          value: function setUnitFormat(subItem) {
-            this.panel.format = subItem.value;
-            this.render();
+            this.addEditorTab('Options', 'public/plugins/grafana-graph3d-panel/editor.html', 2);
           }
         }, {
           key: 'onDataError',
           value: function onDataError() {
             this.series = [];
-            this.render();
-          }
-        }, {
-          key: 'changeSeriesColor',
-          value: function changeSeriesColor(series, color) {
-            series.color = color;
-            this.panel.aliasColors[series.alias] = series.color;
             this.render();
           }
         }, {
@@ -134,13 +105,10 @@ System.register(['app/plugins/sdk', 'lodash', 'app/core/utils/kbn', 'app/core/ti
         }, {
           key: 'parseSeries',
           value: function parseSeries(series) {
-            var _this2 = this;
-
             return _.map(this.series, function (serie, i) {
               return {
                 label: serie.alias,
-                datapoints: serie.datapoints,
-                color: _this2.panel.aliasColors[serie.alias] || _this2.$rootScope.colors[i]
+                datapoints: serie.datapoints
               };
             });
           }
@@ -159,65 +127,33 @@ System.register(['app/plugins/sdk', 'lodash', 'app/core/utils/kbn', 'app/core/ti
               alias: seriesData.target
             });
 
-            series.flotpairs = series.getFlotPairs(this.panel.nullPointMode);
             return series;
           }
         }, {
-          key: 'getDecimalsForValue',
-          value: function getDecimalsForValue(value) {
-            if (_.isNumber(this.panel.decimals)) {
-              return { decimals: this.panel.decimals, scaledDecimals: null };
-            }
-
-            var delta = value / 2;
-            var dec = -Math.floor(Math.log(delta) / Math.LN10);
-
-            var magn = Math.pow(10, -dec);
-            var norm = delta / magn; // norm is between 1.0 and 10.0
-            var size;
-
-            if (norm < 1.5) {
-              size = 1;
-            } else if (norm < 3) {
-              size = 2;
-              // special case for 2.5, requires an extra decimal
-              if (norm > 2.25) {
-                size = 2.5;
-                ++dec;
-              }
-            } else if (norm < 7.5) {
-              size = 5;
-            } else {
-              size = 10;
-            }
-
-            size *= magn;
-
-            // reduce starting decimals if not needed
-            if (Math.floor(value) === value) {
-              dec = 0;
-            }
-
-            var result = {};
-            result.decimals = Math.max(0, dec);
-            result.scaledDecimals = result.decimals - Math.floor(Math.log(size) / Math.LN10) + 2;
-
-            return result;
+          key: 'resetCameraPosition',
+          value: function resetCameraPosition() {
+            // See http://visjs.org/docs/graph3d/#Methods
+            this.panel.cameraPosition = {
+              horizontal: 1.0,
+              vertical: 0.5,
+              distance: 1.7
+            };
+            this.render(this.data);
+          }
+        }, {
+          key: 'loadCameraPosition',
+          value: function loadCameraPosition() {
+            this.panel.cameraPosition = this.currentCameraPosition;
           }
         }, {
           key: 'formatValue',
           value: function formatValue(value) {
-            var decimalInfo = this.getDecimalsForValue(value);
-            var formatFunc = kbn.valueFormats[this.panel.format];
-            if (formatFunc) {
-              return formatFunc(value, decimalInfo.decimals, decimalInfo.scaledDecimals);
-            }
             return value;
           }
         }, {
           key: 'link',
           value: function link(scope, elem, attrs, ctrl) {
-            rendering(scope, elem, attrs, ctrl);
+            this.graph3d = rendering(scope, elem, attrs, ctrl);
           }
         }]);
 
