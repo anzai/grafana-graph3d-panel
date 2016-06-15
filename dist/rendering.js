@@ -100,25 +100,25 @@ System.register(['lodash', 'jquery', './vis'], function (_export, _context) {
       // css
       var width = elem.width();
       var height = elem.height();
-      var size = Math.min(width, height) - 20;
       $(plotDiv).css({
-        width: size + 'px',
-        height: size + 'px',
+        width: width + 'px',
+        height: height + 'px',
         margin: 'auto',
         position: 'relative'
       });
 
       // options
       var options = {
-        width: size + 'px',
-        height: size + 'px',
+        width: width + 'px',
+        height: height + 'px',
         axisColor: '#888888',
 
         style: panel.style,
-        showPerspective: true,
         showGrid: true,
         showShadow: false,
-        verticalRatio: 0.5,
+        showPerspective: panel.showPerspective || false,
+        verticalRatio: panel.verticalRatio || 0.5,
+        keepAspectRatio: panel.keepAspectRatio || false,
 
         xLabel: panel.xLabel || 'time',
         yLabel: panel.yLabel || labels[0],
@@ -137,14 +137,17 @@ System.register(['lodash', 'jquery', './vis'], function (_export, _context) {
         zStep: panel.zStep || null,
 
         xValueLabel: function xValueLabel(key) {
-          return valueLabels[0][key];
+          return valueLabels[0][key] + (panel.xUnit || '');
         },
         yValueLabel: function yValueLabel(key) {
-          return valueLabels[1][key];
+          return valueLabels[1][key] + (panel.yUnit || '');
+        },
+        zValueLabel: function zValueLabel(key) {
+          return key + (panel.zUnit || '');
         },
 
         tooltip: function tooltip(point) {
-          return (panel.xLabel || 'time') + ': ' + valueLabels[0][point.x] + '<br>' + (panel.yLabel || labels[0]) + ': ' + valueLabels[1][point.y] + '<br>' + (panel.zLabel || labels[1]) + ': <b>' + point.z + '</b>';
+          return (panel.xLabel || 'time') + ': ' + valueLabels[0][point.x] + (panel.xUnit || '') + '<br>' + (panel.yLabel || labels[0]) + ': ' + valueLabels[1][point.y] + (panel.yUnit || '') + '<br>' + (panel.zLabel || labels[1]) + ': ' + '<b>' + point.z + (panel.zUnit || '') + '</b>';
         }
       };
 
@@ -153,7 +156,6 @@ System.register(['lodash', 'jquery', './vis'], function (_export, _context) {
           delete options[key];
         }
       }
-      console.log(options);
 
       // draw
       var graph3d = new vis.Graph3d(plotDiv, graphdata, options);
