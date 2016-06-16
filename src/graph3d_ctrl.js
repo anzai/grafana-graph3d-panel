@@ -1,6 +1,6 @@
 import {MetricsPanelCtrl} from 'app/plugins/sdk';
 import _ from 'lodash';
-//import kbn from 'app/core/utils/kbn';
+import kbn from 'app/core/utils/kbn';
 import TimeSeries from 'app/core/time_series';
 import rendering from './rendering';
 
@@ -10,9 +10,34 @@ export class Graph3dCtrl extends MetricsPanelCtrl {
     super($scope, $injector);
     this.$rootScope = $rootScope;
 
+    this.columnTypes = [
+      {text: 'Number', value: 'number'},
+      {text: 'String', value: 'string'},
+      {text: 'Date', value: 'date'},
+    ];
+
+    this.dateFormats = [
+      {text: 'YYYY-MM-DD HH:mm:ss', value: 'YYYY-MM-DD HH:mm:ss'},
+      {text: 'MM/DD/YY h:mm:ss a', value: 'MM/DD/YY h:mm:ss a'},
+      {text: 'MMMM D, YYYY LT',  value: 'MMMM D, YYYY LT'},
+    ];
+
+    this.unitFormats = kbn.getUnitFormats();
+
     var panelDefault = {
-      style: 'bar'
-    }
+      graphType: 'bar',
+      styles: {
+        x: {
+            axis: 'X', type: 'number', unit: 'none', decimals: null
+        },
+        y: {
+            axis: 'Y', type: 'number', unit: 'none', decimals: null
+        },
+        z: {
+            axis: 'Z', type: 'number', unit: 'none', decimals: null
+        }
+      }
+    };
     _.defaults(this.panel, panelDefault);
     if (! this.panel.cameraPosition) {
       this.resetCameraPosition();
@@ -61,6 +86,11 @@ export class Graph3dCtrl extends MetricsPanelCtrl {
 
     return series;
   }
+
+  setUnitFormat(column, subItem) {
+    column.unit = subItem.value;
+    this.render(this.data);
+  };
 
   resetCameraPosition() {
     // See http://visjs.org/docs/graph3d/#Methods

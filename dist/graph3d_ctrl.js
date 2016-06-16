@@ -1,9 +1,9 @@
 'use strict';
 
-System.register(['app/plugins/sdk', 'lodash', 'app/core/time_series', './rendering'], function (_export, _context) {
+System.register(['app/plugins/sdk', 'lodash', 'app/core/utils/kbn', 'app/core/time_series', './rendering'], function (_export, _context) {
   "use strict";
 
-  var MetricsPanelCtrl, _, TimeSeries, rendering, _createClass, Graph3dCtrl;
+  var MetricsPanelCtrl, _, kbn, TimeSeries, rendering, _createClass, Graph3dCtrl;
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -40,6 +40,8 @@ System.register(['app/plugins/sdk', 'lodash', 'app/core/time_series', './renderi
       MetricsPanelCtrl = _appPluginsSdk.MetricsPanelCtrl;
     }, function (_lodash) {
       _ = _lodash.default;
+    }, function (_appCoreUtilsKbn) {
+      kbn = _appCoreUtilsKbn.default;
     }, function (_appCoreTime_series) {
       TimeSeries = _appCoreTime_series.default;
     }, function (_rendering) {
@@ -74,8 +76,25 @@ System.register(['app/plugins/sdk', 'lodash', 'app/core/time_series', './renderi
 
           _this.$rootScope = $rootScope;
 
+          _this.columnTypes = [{ text: 'Number', value: 'number' }, { text: 'String', value: 'string' }, { text: 'Date', value: 'date' }];
+
+          _this.dateFormats = [{ text: 'YYYY-MM-DD HH:mm:ss', value: 'YYYY-MM-DD HH:mm:ss' }, { text: 'MM/DD/YY h:mm:ss a', value: 'MM/DD/YY h:mm:ss a' }, { text: 'MMMM D, YYYY LT', value: 'MMMM D, YYYY LT' }];
+
+          _this.unitFormats = kbn.getUnitFormats();
+
           var panelDefault = {
-            style: 'bar'
+            graphType: 'bar',
+            styles: {
+              x: {
+                axis: 'X', type: 'number', unit: 'none', decimals: null
+              },
+              y: {
+                axis: 'Y', type: 'number', unit: 'none', decimals: null
+              },
+              z: {
+                axis: 'Z', type: 'number', unit: 'none', decimals: null
+              }
+            }
           };
           _.defaults(_this.panel, panelDefault);
           if (!_this.panel.cameraPosition) {
@@ -132,6 +151,12 @@ System.register(['app/plugins/sdk', 'lodash', 'app/core/time_series', './renderi
             });
 
             return series;
+          }
+        }, {
+          key: 'setUnitFormat',
+          value: function setUnitFormat(column, subItem) {
+            column.unit = subItem.value;
+            this.render(this.data);
           }
         }, {
           key: 'resetCameraPosition',

@@ -1,9 +1,9 @@
 'use strict';
 
-System.register(['lodash', 'jquery', './vis'], function (_export, _context) {
+System.register(['lodash', 'jquery', 'moment', 'app/core/utils/kbn', './vis'], function (_export, _context) {
   "use strict";
 
-  var _, $, vis;
+  var _, $, moment, kbn, vis;
 
   function link(scope, elem, attrs, ctrl) {
     var data, panel, position;
@@ -60,16 +60,72 @@ System.register(['lodash', 'jquery', './vis'], function (_export, _context) {
       };
     }
 
+    function createColumnFormater(style) {
+      var defaultFormater = function defaultFormater(v) {
+        if (v === null || v === void 0 || v === undefined) {
+          return '';
+        }
+        if (_.isArray(v)) {
+          v = v.join(', ');
+        }
+        return v;
+      };
+
+      if (!style) {
+        return defaultFormater;
+      }
+
+      switch (style.type) {
+        case 'date':
+          return function (v) {
+            if (_.isArray(v)) {
+              v = v[0];
+            }
+            var date = moment(v);
+            if (ctrl.dashboard.isTimezoneUtc()) {
+              date = date.utc();
+            }
+            return date.format(style.dateFormat || 'YYYY-MM-DD HH:mm:ss');
+          };
+          break;
+
+        case 'number':
+          var valueFormater = kbn.valueFormats[style.unit];
+
+          return function (v) {
+            if (v === null || v === void 0) {
+              return '-';
+            }
+
+            if (_.isString(v)) {
+              return v;
+            }
+
+            return valueFormater(v, style.decimals, null);
+          };
+          break;
+
+        default:
+          return defaultFormater;
+      }
+    }
+
     function addGraph3d() {
       if (data.length === 0) {
         return;
       }
 
+      var formater = {
+        x: createColumnFormater(panel.styles.x),
+        y: createColumnFormater(panel.styles.y),
+        z: createColumnFormater(panel.styles.z)
+      };
+
       var labels = _.pluck(data, 'label');
 
       var datapoints = [];
       datapoints.push(_.map(data[0].datapoints, function (dp) {
-        return dp[1];
+        return formater.x(dp[1]);
       }));
       datapoints = datapoints.concat(_.map(data, function (serie) {
         return _.map(serie.datapoints, function (dp) {
@@ -107,47 +163,57 @@ System.register(['lodash', 'jquery', './vis'], function (_export, _context) {
         position: 'relative'
       });
 
-      // options
+      var axisLabels = {
+        x: panel.styles.x.label || 'time',
+        y: panel.styles.y.label || labels[0],
+        z: panel.styles.z.label || labels[1]
+      };
+      var units = {
+        x: kbn.valueFormats[panel.styles.x.unit] || panel.styles.x.unit || '',
+        y: kbn.valueFormats[panel.styles.y.unit] || panel.styles.y.unit || '',
+        z: kbn.valueFormats[panel.styles.z.unit] || panel.styles.z.unit || ''
+      };
+
       var options = {
         width: width + 'px',
         height: height + 'px',
         axisColor: '#888888',
 
-        style: panel.style,
+        style: panel.graphType,
         showGrid: true,
         showShadow: false,
         showPerspective: panel.showPerspective || false,
         verticalRatio: panel.verticalRatio || 0.5,
         keepAspectRatio: panel.keepAspectRatio || false,
 
-        xLabel: panel.xLabel || 'time',
-        yLabel: panel.yLabel || labels[0],
-        zLabel: panel.zLabel || labels[1],
+        xLabel: axisLabels.x,
+        yLabel: axisLabels.y,
+        zLabel: axisLabels.z,
 
-        xMin: panel.xMin || null,
-        yMin: panel.yMin || null,
-        zMin: panel.zMin || null,
+        xMin: panel.styles.x.min || null,
+        yMin: panel.styles.y.min || null,
+        zMin: panel.styles.z.min || null,
 
-        xMax: panel.xMax || null,
-        yMax: panel.yMax || null,
-        zMax: panel.zMax || null,
+        xMax: panel.styles.x.max || null,
+        yMax: panel.styles.y.max || null,
+        zMax: panel.styles.z.max || null,
 
-        xStep: panel.xStep || null,
-        yStep: panel.yStep || null,
-        zStep: panel.zStep || null,
+        xStep: panel.styles.x.step || null,
+        yStep: panel.styles.y.step || null,
+        zStep: panel.styles.z.step || null,
 
         xValueLabel: function xValueLabel(key) {
-          return valueLabels[0][key] + (panel.xUnit || '');
+          return formater.x(valueLabels[0][key]);
         },
         yValueLabel: function yValueLabel(key) {
-          return valueLabels[1][key] + (panel.yUnit || '');
+          return formater.y(valueLabels[1][key]);
         },
         zValueLabel: function zValueLabel(key) {
-          return key + (panel.zUnit || '');
+          return formater.z(key);
         },
 
         tooltip: function tooltip(point) {
-          return (panel.xLabel || 'time') + ': ' + valueLabels[0][point.x] + (panel.xUnit || '') + '<br>' + (panel.yLabel || labels[0]) + ': ' + valueLabels[1][point.y] + (panel.yUnit || '') + '<br>' + (panel.zLabel || labels[1]) + ': ' + '<b>' + point.z + (panel.zUnit || '') + '</b>';
+          return axisLabels.x + ': ' + formater.x(valueLabels[0][point.x]) + '<br>' + axisLabels.y + ': ' + formater.y(valueLabels[1][point.y]) + '<br>' + axisLabels.z + ': ' + '<b>' + formater.z(point.z) + '</b>';
         }
       };
 
@@ -174,6 +240,10 @@ System.register(['lodash', 'jquery', './vis'], function (_export, _context) {
       _ = _lodash.default;
     }, function (_jquery) {
       $ = _jquery.default;
+    }, function (_moment) {
+      moment = _moment.default;
+    }, function (_appCoreUtilsKbn) {
+      kbn = _appCoreUtilsKbn.default;
     }, function (_vis) {
       vis = _vis.default;
     }],
